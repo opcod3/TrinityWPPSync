@@ -10,19 +10,25 @@ namespace TrinityWPPSync
     /// </summary>
     public static class Config
     {
-        [ConfigKey("-op", "Path to TrinityCore Opcodes.h file.")]
-        public static string opcodeHeader = AppDomain.CurrentDomain.BaseDirectory + "./Opcodes.h";
+        [ConfigKey("-o", "Path of output file.")]
+        public static string outputPath = "Opcodes_synced.h";
 
-        [ConfigKey("-nogit", "Use local Opcodes.cs instead of the one hosted on github.")]
-        public static string noGit = string.Empty;
+        [ConfigKey("-localwpp", "Path to local WPP Opcodes.cs")]
+        public static string localPathWPP = string.Empty;
+        public static bool localWPP = false;
+
+        [ConfigKey("-localtc", "Path to local TrinityCore Opcodes.h")]
+        public static string localPathTC = string.Empty;
+        public static bool localTC = false;
 
         [ConfigKey("-help", "Show help.")]
         public static bool help = false;
 
         public static bool Load(string[] args)
         {
-            TryGet<string>(args, "-op", ref opcodeHeader, AppDomain.CurrentDomain.BaseDirectory + "./Opcodes.h");
-            TryGet<string>(args, "-nogit", ref noGit, string.Empty);
+            localWPP = TryGet<string>(args, "-localwpp", ref localPathWPP, AppDomain.CurrentDomain.BaseDirectory + "./Opcodes.cs");
+            localTC = TryGet<string>(args, "-localtc", ref localPathTC, AppDomain.CurrentDomain.BaseDirectory + "./Opcodes.h");
+            TryGet<string>(args, "-o", ref outputPath, "Opcodes_synced.h");
             TryGet<bool>(args, "-help", ref help, false);
 
             return help ? ShowHelp() : true;
@@ -30,7 +36,7 @@ namespace TrinityWPPSync
 
         public static bool ShowHelp()
         {
-            Console.WriteLine("Arguments:");
+            Console.WriteLine("Optional arguments:");
 
             var fields = typeof(Config).GetFields(BindingFlags.Static | BindingFlags.Public);
             var keys = new List<string>();
@@ -71,42 +77,50 @@ namespace TrinityWPPSync
             }
             else
             {
-                var val = args[index + 1];
-                using (var box = new ValueBox<T>())
+                try
                 {
-                    switch (keyType)
+                    var val = args[index + 1];
+                    using (var box = new ValueBox<T>())
                     {
-                        case TypeCode.UInt32:
-                            box.ObjectValue = Convert.ToUInt32(val);
-                            break;
-                        case TypeCode.Int32:
-                            box.ObjectValue = Convert.ToInt32(val);
-                            break;
-                        case TypeCode.UInt16:
-                            box.ObjectValue = Convert.ToUInt16(val);
-                            break;
-                        case TypeCode.Int16:
-                            box.ObjectValue = Convert.ToInt16(val);
-                            break;
-                        case TypeCode.Byte:
-                            box.ObjectValue = Convert.ToByte(val);
-                            break;
-                        case TypeCode.SByte:
-                            box.ObjectValue = Convert.ToSByte(val);
-                            break;
-                        case TypeCode.Single:
-                            box.ObjectValue = Convert.ToSingle(val);
-                            break;
-                        case TypeCode.String:
-                            box.ObjectValue = Convert.ToString(val);
-                            break;
-                        default:
-                            Console.WriteLine("Unable to read value for argument {0}", argName);
-                            break;
+                        switch (keyType)
+                        {
+                            case TypeCode.UInt32:
+                                box.ObjectValue = Convert.ToUInt32(val);
+                                break;
+                            case TypeCode.Int32:
+                                box.ObjectValue = Convert.ToInt32(val);
+                                break;
+                            case TypeCode.UInt16:
+                                box.ObjectValue = Convert.ToUInt16(val);
+                                break;
+                            case TypeCode.Int16:
+                                box.ObjectValue = Convert.ToInt16(val);
+                                break;
+                            case TypeCode.Byte:
+                                box.ObjectValue = Convert.ToByte(val);
+                                break;
+                            case TypeCode.SByte:
+                                box.ObjectValue = Convert.ToSByte(val);
+                                break;
+                            case TypeCode.Single:
+                                box.ObjectValue = Convert.ToSingle(val);
+                                break;
+                            case TypeCode.String:
+                                box.ObjectValue = Convert.ToString(val);
+                                break;
+                            default:
+                                Console.WriteLine("Unable to read value for argument {0}", argName);
+                                break;
+                        }
+                        dest = box.GetValue();
                     }
-                    dest = box.GetValue();
+                }
+                catch (IndexOutOfRangeException /*e*/)
+                {
+                    dest = defaultValue;
                 }
                 return true;
+
             }
         }
     }

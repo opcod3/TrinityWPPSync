@@ -18,13 +18,13 @@ namespace TrinityWPPSync
             if ((smsg ? SMSG : CMSG).Count != 0)
                 return true;
 
-            Console.WriteLine("Loading opcodes from GitHub, build 19802...");
+            Console.WriteLine("Loading opcodes from WowPacketParser...");
             try
             {
                 Stream stream;
-                if(Config.noGit != string.Empty)
+                if(Config.localWPP)
                 {
-                    stream = File.OpenRead(Config.noGit);
+                    stream = File.OpenRead(Config.localPathWPP);
                 }
                 else
                 {

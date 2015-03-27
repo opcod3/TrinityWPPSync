@@ -10,7 +10,6 @@ namespace TrinityWPPSync
     {
         static void Main(string[] args)
         {
-            //Console.WriteLine(">> Loading configuration options...");
             if (!Config.Load(args))
                 return;
 

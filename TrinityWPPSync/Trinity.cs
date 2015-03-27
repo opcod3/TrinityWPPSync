@@ -11,20 +11,28 @@ namespace TrinityWPPSync
     class Trinity
     {
         public static Regex OpcodeRgx = new Regex(@"\s+((CMSG|SMSG)\w+)\s+=\s*0x(\w+),", RegexOptions.IgnoreCase);
+        private static string FilePath = @"https://raw.githubusercontent.com/TrinityCore/TrinityCore/6.x/src/server/game/Server/Protocol/Opcodes.h";
 
         public static void Sync()
         {
             Console.WriteLine("Syncing with TrinityCore...");
             try
             {
-                Stream stream = File.Open(Config.opcodeHeader, FileMode.Open);
+                Stream stream;
+                if (Config.localTC)
+                    stream = File.Open(Config.localPathTC, FileMode.Open);
+                else
+                {
+                    WebClient client = new WebClient();
+                    stream = client.OpenRead(FilePath);
+                }
 
                 StreamReader reader = new StreamReader(stream);
 
                 var content = reader.ReadToEnd().Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
                 stream.Close();
 
-                StreamWriter writer = new StreamWriter("Opcodes_synced.h", false);
+                StreamWriter writer = new StreamWriter(Config.outputPath, false);
                 foreach (var line in content)
                 {
                     var rgxResult = OpcodeRgx.Match(line);
