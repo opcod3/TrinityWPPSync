@@ -44,7 +44,7 @@ namespace TrinityWPPSync
                         switch (rgxResult.Groups[2].Value)
                         {
                             case "CMSG":
-                                if(WPP.CMSG.ContainsKey(opcodeName))
+                                if(WPP.CMSG.ContainsKey(opcodeName) && !Config.noCMSG)
                                 {
                                     int wppVal = WPP.CMSG[opcodeName];
                                     writer.WriteLine("    {0}= 0x{1:X4},", opcodeName.PadRight(50), wppVal);
@@ -54,7 +54,7 @@ namespace TrinityWPPSync
                                 break;
 
                             case "SMSG":
-                                if (WPP.SMSG.ContainsKey(opcodeName))
+                                if (WPP.SMSG.ContainsKey(opcodeName) && !Config.noSMSG)
                                 {
                                     int wppVal = WPP.SMSG[opcodeName];
                                     writer.WriteLine("    {0}= 0x{1:X4},", opcodeName.PadRight(50), wppVal);
@@ -63,8 +63,6 @@ namespace TrinityWPPSync
                                     writer.WriteLine(line);
                                 break;
                         }
-
-
                     }
                     else
                     {

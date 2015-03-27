@@ -13,6 +13,12 @@ namespace TrinityWPPSync
             if (!Config.Load(args))
                 return;
 
+            if (Config.noCMSG && Config.noSMSG)
+            {
+                Console.WriteLine("All Sync Disabled!");
+                return;
+            }
+
             WPP.TryPopulate();
             Trinity.Sync();
         }

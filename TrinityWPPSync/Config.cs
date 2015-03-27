@@ -21,6 +21,12 @@ namespace TrinityWPPSync
         public static string localPathTC = string.Empty;
         public static bool localTC = false;
 
+        [ConfigKey("-nosmsg", "Do not update SMSGs.")]
+        public static bool noSMSG = false;
+
+        [ConfigKey("-nocmsg", "Do not update CMSGs.")]
+        public static bool noCMSG = false;
+
         [ConfigKey("-help", "Show help.")]
         public static bool help = false;
 
@@ -29,6 +35,8 @@ namespace TrinityWPPSync
             localWPP = TryGet<string>(args, "-localwpp", ref localPathWPP, AppDomain.CurrentDomain.BaseDirectory + "./Opcodes.cs");
             localTC = TryGet<string>(args, "-localtc", ref localPathTC, AppDomain.CurrentDomain.BaseDirectory + "./Opcodes.h");
             TryGet<string>(args, "-o", ref outputPath, "Opcodes_synced.h");
+            TryGet<bool>(args, "-nosmsg", ref noSMSG, false);
+            TryGet<bool>(args, "-nocmsg", ref noCMSG, false);
             TryGet<bool>(args, "-help", ref help, false);
 
             return help ? ShowHelp() : true;
